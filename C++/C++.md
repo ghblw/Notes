@@ -80,7 +80,7 @@ const:read only只读变量
 - C++:真正的常量
 - C:只读的变量
 
-举例：指针修改	
+	例：指针修改	
 
 ```c
 /*************************************************************************
@@ -162,6 +162,22 @@ int main() {
 
 局部变量不能当引用返回
 
+```c++
+#include<iostream>
+using namespace std;
+
+int &f() {
+    int a = 100;
+    return a;
+}
+int main() {
+    int &c = f();
+    cout << c << endl;
+}
+```
+
+
+
 **传参、默认值**
 
 传参，从左向右
@@ -172,11 +188,15 @@ int main() {
 
 参数可能有默认值，没有默认值的需要传参，否则报参数不匹配
 
-函数参数如果带默认值，在声明时有默认值，实现时不能有默认值
+函数参数如果带默认值，在声明时有默认值，实现时不能有默认值？
+
+
 
 **函数参数的占位**
 
 只有类型，没有形参（为了兼容C）
+
+
 
 **函数重载**
 
@@ -197,7 +217,57 @@ int main() {
 
 函数重载＋默认参数（二义性）
 
-函数重载＋函数指针，首先参数类型和参数个数要相同，其次返回值类型也要相同，强类型
+`error: call of overloaded ‘add()’ is ambiguous`
+
+函数重载＋函数指针，首先参数类型和参数个数要相同，其次**返回值类型也要相同**，C++是强类型语言
+
+```c++
+#include<iostream>
+#include<cstdio>
+#include<string>
+using std::cin;
+using std::cout;
+using std::endl;
+using std::string;
+
+namespace yxw {
+    int add(int x, int y = 3) {
+        return x + y;
+    }
+    int add() {
+        return 100;
+    }
+    string add(string &s1, string &s2) {
+        return s1 + s2;
+    }
+}
+
+using namespace yxw;
+int (*p1)(int, int);
+int (*p2)();
+int main() {
+    string s1 = "yxw", s2 = "haizei";
+    p1 = add;
+    p2 = add;
+    int c = (*p1)(1, 2);
+    int d = (*p2)();
+    cout << c << " " << d << endl;
+    cout << add() << endl;
+    cout << add(0) << endl;
+    cout << add(s1, s2) << endl;
+    printf("%p %p\n", p1, p2);
+}
+/*
+输出：
+3 100
+100
+3
+yxwhaizei
+0x400e16 0x400e2a
+*/
+```
+
+
 
 **编译器调用准则（2条）**
 
