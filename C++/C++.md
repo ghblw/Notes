@@ -691,9 +691,7 @@ int main() {
 
 ```
 
-
-
-必须使用初始化列表：
+#####必须使用初始化列表的情况
 
 - const成员属性
 - 类属性
@@ -702,15 +700,59 @@ int main() {
 
   当构造函数执行到函数体时，对象已经有了，初始化列表相当于边生成对象时边初始化
 
-初始化列表的初始化顺序与成员属性的声明顺序相同
+#####注意事项
 
-初始化顺序与实际初始化列表中的位置无关
+- 初始化列表的初始化顺序与成员属性的声明顺序相同
+- 初始化顺序与实际初始化列表中的位置无关
+- 初始化列表优先于函数体执行
 
-初始化列表优先于函数体执行
+```c++
+//关于顺序
+#include <iostream>
+#include <string>
+#include <algorithm>
 
+using std::cin;
+using std::cout;
+using std::endl;
+using std::string;
+
+class Value {
+    private:
+    int i;
+    public:
+    Value(int v) : i(v) {
+        cout << "Value :: i = " << i << endl;
+    }
+};
+
+class Test {
+    private:
+    Value v1;
+    Value v3;
+    Value v2;//实际尽量按123写
+    public:
+    Test();
+};
+
+Test::Test() : v1(1), v2(2), v3(3) {
+    //为了证明初始化列表优于函数体先执行
+    cout << "Test()" << endl;
+}
+
+int main() {
+    Test t;
+    return 0;
+}
+/*输出
+Value :: i = 1
+Value :: i = 3
+Value :: i = 2
+Test()
+*/
 ```
 
-```
+
 
 
 
@@ -742,7 +784,7 @@ C++标准中全局对象构造顺序不定，尽量不用全局对象
 
 再自己
 
-####类属性与方法
+####静态成员变量和静态成员方法
 
 静态成员变量属于整个类
 
@@ -777,7 +819,7 @@ class Test {
         int m;
     public:
     static int getCnt() {
-        return m;
+        return m;//错误，因为静态成员函数没有this指针，不能确定是哪个对象的
     }
     Test() {
         m = 1;
@@ -803,7 +845,7 @@ int main() {
 
 
 
-**静态成员方法和普通成员方法的区别**
+####静态成员方法和普通成员方法的区别（this指针）
 
 
 
@@ -811,13 +853,21 @@ int main() {
 
 每个成员方法有一个隐藏的this指针，是某个对象的地址
 
-静态成员函数没有this指针
+静态成员函数没有**this指针**
 
 找不到普通成员变量（需要传参）
 
 
 
-this	当前对象的某个指针
+####this指针
+
+每个成员方法都有一个隐藏的this指针，是某个对象的地址
+
+当前对象的某个指针
+
+不同的对象怎么找到自己的方法
+
+
 
 ####const方法
 
@@ -870,3 +920,4 @@ const方法只能调用const方法
 减少临时对象
 
 尽量传引用
+
